@@ -25,45 +25,44 @@ def lambda_handler(event, context):
 
 	trie = make_trie(checkset)
 	print('Made trie!')
-	try:
-		for record in event['Records']:
-			#Kinesis data is base64 encoded so decode here
-			record=base64.b64decode(record["kinesis"]["data"])
-			#print("Decoded payload: " + record)
-			jdata = json.loads(record)
-			try:
+	for record in event['Records']:
+		#Kinesis data is base64 encoded so decode here
+		record=base64.b64decode(record["kinesis"]["data"])
+		#print("Decoded payload: " + record)
+		jdata = json.loads(record)
+		try:
 
-				text = jdata["text"].lower()
-				#strip punctuations
-				text = re.sub(ur"\p{P}+", "", text)
-				answer = in_trie(trie, text)
-				if answer[0] == True:
-					print("MATCHED: ", answer[1])
-					#extract from json 3 things for table. User, MsgID, TS.
-					user = jdata["user"]["screen_name"]
-					msgid = jdata["id_str"]
+			text = jdata["text"].lower()
+			#strip punctuations
+			text = re.sub(ur"\p{P}+", "", text)
+			answer = in_trie(trie, text)
+			if answer[0] == True:
+				print("MATCHED: ", answer[1])
+				#extract from json 3 things for table. User, MsgID, TS.
+				user = jdata["user"]["screen_name"]
+				msgid = jdata["id_str"]
 
-					#get epoch time
-					created = jdata["created_at"]
-					created = created[0:20] + created[26:30]
-					#Weekday Month Day HH:MM:SS Year
-					date_time = datetime.strptime(created, "%a %b %d %H:%M:%S %Y")
-					ts = int(timegm(date_time.timetuple()))
+				#get epoch time
+				created = jdata["created_at"]
+				created = created[0:20] + created[26:30]
+				#Weekday Month Day HH:MM:SS Year
+				date_time = datetime.strptime(created, "%a %b %d %H:%M:%S %Y")
+				ts = int(timegm(date_time.timetuple()))
 
-					dynamodb.put_item(TableName="Game", Item={
-						"Title": {"S": answer[1][0:len(answer[1])-1]},
-						"TimeEnoch": {"N": str(ts)},
-						"User": {"S": user},
-						"Msg": {"S": jdata["text"]},
-						"MsgID": {"N": msgid},
-						}
-					)
+				dynamodb.put_item(TableName="Game", Item={
+					"Title": {"S": answer[1][0:len(answer[1])-1]},
+					"TimeEnoch": {"N": str(ts)},
+					"User": {"S": user},
+					"Msg": {"S": jdata["text"]},
+					"MsgID": {"N": msgid},
+					}
+				)
 
-					print("Insert successful!")
-				else:
-					print("NO MATCH!")
+				print("Insert successful!")
+			else:
+				print("NO MATCH!")
 
 
-			except KeyError:
-				#deleted status
-				continue
+		except KeyError:
+			#deleted status
+			continue
