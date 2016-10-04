@@ -30,7 +30,6 @@ def lambda_handler(event, context):
 			#Kinesis data is base64 encoded so decode here
 			record=base64.b64decode(record["kinesis"]["data"])
 			#print("Decoded payload: " + record)
-
 			jdata = json.loads(record)
 			try:
 
@@ -52,8 +51,8 @@ def lambda_handler(event, context):
 					ts = int(timegm(date_time.timetuple()))
 
 					dynamodb.put_item(TableName="Game", Item={
-						"Title": {"S": answer[1]},
-						"Time": {"N": str(ts)},
+						"Title": {"S": answer[1][0:len(answer[1])-1]},
+						"TimeEnoch": {"N": str(ts)},
 						"User": {"S": user},
 						"Msg": {"S": jdata["text"]},
 						"MsgID": {"N": msgid},
@@ -68,6 +67,3 @@ def lambda_handler(event, context):
 			except KeyError:
 				#deleted status
 				continue
-	except KeyError:
-		print("KeyError where it shouldn't be! Exiting")
-

@@ -7,7 +7,6 @@ def make_trie(*theSet):
 		current = root
 		for phrase in phrases:
 			for word in phrase.split():
-				#print word
 				current = current.setdefault(word, {})
 			current[_end] = _end
 			current = root
@@ -51,3 +50,6 @@ def rec(trie, phrase, i):
 			return [True, '']
 		else:
 			return [False, '']
+
+
+			

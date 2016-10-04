@@ -10,13 +10,13 @@ import time
 
 import boto3
 
+#for twitter stream
 class Listen(StreamListener):
 	count = 1
 	shardCt = 4
 	def on_data(self, data):
-		#print data
 		kinesis.put_record(StreamName=kstream, Data=data, PartitionKey=str(Listen.count))
-		Listen.count = (Listen.count+1) % 4
+		Listen.count = (Listen.count+1) % Listen.shardCt
 		return True
 
 	def on_error(self, status):
@@ -24,7 +24,8 @@ class Listen(StreamListener):
 
 if len(sys.argv) <  2:
 	print("Not enough arguments! Please specify file to find access keys to Twitter API")
-	print("File format: 4 lines, one code on each line. Consumer key, secret, and access token, secret")
+	print("File format: 4 lines, one code on each line")
+	print("Consumer key \nConsumer secret \nAccess token \nAccess secret")
 	exit()
 
 file = sys.argv[1]
@@ -41,7 +42,7 @@ key2 = f.readline().strip()
 key3 = f.readline().strip()
 key4 = f.readline().strip()
 
-
+#setting up twitter stream with proper authorizations
 auth = OAuthHandler(key1, key2)
 auth.set_access_token(key3, key4)
 stream = Stream(auth, Listen())
@@ -51,7 +52,7 @@ kstream = 'snstream'
 
 if kstream not in [f for f in kinesis.list_streams()['StreamNames']]:
 	print 'Creating Kinesis stream %s' % kstream
-	kinesis.create_stream(StreamName = kstream, ShardCount = 4)
+	kinesis.create_stream(StreamName = kstream, ShardCount = Listen.shardCt)
 else:
 	print 'Kinesis stream already exists'
 
@@ -71,4 +72,7 @@ while True:
 		exit()
 	except ProtocolError:
 		print 'Incomplete read crashed the stream! Restarting Twitter stream..'
+		continue
+	except AttributeError:
+		#stream returned NoneType, or no tweet
 		continue
