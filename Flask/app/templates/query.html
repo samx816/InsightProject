@@ -1,0 +1,25 @@
+{% extends "base.html" %} <!--this means that you are extending the base tempat -->
+{% block gameid %} <!-- this is the name of the block below -->
+       <div class="row" style="height:100vh;">
+               <div class="col-md-4 col-md-offset-4" style="margin-top:10vh;">
+                       <form action"queryop" method="POST">
+<!-- action is the html template that will return the result to this input query -->
+                               <div class="form-group text-center">
+                                       <label style="font-weight:300; font-size:36px;">Type in the game to query for as well as the date range</label>
+                                       <br /><br />
+                                       <p>Game Title:</p>
+				       <input type="text" class="form-control" id="gameid" name = "gameid" placeholder="Pokemon Go">
+					<br /><br />
+					<p>Start of range:</p>
+                                       <input type="text" class="form-control" name="start" placeholder="mm/dd/yyyy HH:MM:SS">
+				       <br /><br />
+					<p>End of range:</p>
+				       <input type="text" class="form-control" name="end" placeholder="mm/dd/yyyy HH:MM:SS">
+                                       <br /><br />
+
+                                       <button type="submit" value="Send" name="gameid-container" class="btn btn-default id-submit">Submit</button>
+                               </div>
+                       </form>
+               </div>
+       </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block queryop %}
+<p>The total number of mentions for <b>{{gameid}}</b> between <b>{{start}}</b> and <b>{{end}}</b> is <b>{{count}}</b>.</p>
+<br />
+<p>Here are the tweets:</p>
+<div class="container">
+     <div class="starter-template2">
+       <div class="row" style="height:100vh;">
+               <div class="col-md-10 col-md-offset-1">
+                   <table class="table">
+                     <thead>
+                       <tr>
+                         <th>User</th>
+                         <th>Time</th>
+                         <th>Message</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {% for val in output %}
+                       <tr>
+                         <td>{{val.User}}</td>
+			 <td>{{val.Time}}</td>
+			 <td>{{val.Message}}</td>
+                       </tr>
+                       {% endfor %}
+                     </tbody>
+                   </table>
+               </div>
+       </div>
+     </div>
+   </div>
+<br /><br />
+{% endblock %}
