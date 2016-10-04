@@ -59,9 +59,9 @@ else:
 while kinesis.describe_stream(StreamName=kstream)['StreamDescription']['StreamStatus'] == 'CREATING':
 	time.sleep(2)
 
-print("Streaming now..")
 while True:
 	try:
+		print('Streaming...')
 		t = stream.sample()
 	except KeyboardInterrupt:
 		print 'Stopping..'
